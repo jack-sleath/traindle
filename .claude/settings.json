@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest:*)",
+      "Read(//c/Users/jackw/source/repos/jack-sleath/**)",
+      "Bash(rsync:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm test)",
+      "Bash(npm run build:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.wikidata.org)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\jackw\\source\\repos\\jack-sleath\\traindle-scaffold"
+    ]
+  }
+}
