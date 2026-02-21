@@ -51,13 +51,6 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
   } else if (result === 'wrong') {
     bg = 'bg-red-500 dark:bg-red-600';
     icon = '✗';
-  } else if (result === 'higher') {
-    bg = 'bg-amber-400 dark:bg-amber-500';
-    icon = '↑';
-  } else {
-    // lower
-    bg = 'bg-amber-400 dark:bg-amber-500';
-    icon = '↓';
   }
 
   const displayValue = Array.isArray(value) ? value.join(', ') : value;

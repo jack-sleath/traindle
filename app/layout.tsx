@@ -27,6 +27,7 @@ export default function RootLayout({
       <head>
         {/* Prevent flash of unstyled content: apply dark class before first paint */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `try{var t=localStorage.getItem('theme');if(t==='dark'||(t===null&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}`,
           }}
