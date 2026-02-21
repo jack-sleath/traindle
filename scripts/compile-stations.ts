@@ -21,6 +21,8 @@ interface UkStation {
   name: string;
   operators: string[];
   owningOperator: string;
+  platforms: number | null;   // from NRDP Knowledgebase (NumOfPlatforms)
+  stationType: string | null; // from NRDP Knowledgebase: 'through' | 'terminus' | 'request'
 }
 
 interface CompiledStation {
@@ -76,35 +78,44 @@ const REGION_OPERATOR: Record<Region, string> = {
   'South West': 'South Western Railway',
 };
 
+// Expand any TOC codes that the NRDP scraper left unresolved
+const TOC_EXPANSION: Record<string, string> = {
+  GM: 'Metrolink',
+  HS: 'Southeastern High Speed',
+  LD: 'Lumo',
+  LN: 'London Northwestern Railway',
+  LT: 'Transport for London',
+  QC: 'West Coast Railways',
+  TW: 'Tyne and Wear Metro',
+  WM: 'West Midlands Metro',
+};
+// Non-passenger / infrastructure codes to remove from operator lists
+const TOC_FILTER = new Set(['NR', 'LF', 'XP', 'XS']);
+
+function cleanOperators(operators: string[]): string[] {
+  return operators
+    .map((op) => (op.length <= 2 ? TOC_EXPANSION[op] ?? op : op))
+    .filter((op) => !TOC_FILTER.has(op));
+}
+
 function assignOperators(crsCode: string, region: Region, ukStations: Record<string, UkStation>): string[] {
   const ukEntry = ukStations[crsCode];
-  if (ukEntry?.operators?.length) return ukEntry.operators;
+  if (ukEntry?.operators?.length) {
+    const cleaned = cleanOperators(ukEntry.operators);
+    if (cleaned.length) return cleaned;
+  }
   return [REGION_OPERATOR[region]];
 }
 
 // ── Footfall band assignment ─────────────────────────────────────────────────
 
-// Known high-footfall stations (approximate)
-const HIGH_FOOTFALL: Set<string> = new Set([
-  'WAT', 'VIC', 'LBG', 'FST', 'EUS', 'PAD', 'KGX', 'MAN', 'BHM', 'LDS',
-  'EDB', 'GLC', 'NCL', 'LIV', 'SHF', 'BRI', 'RDG', 'CST', 'CTK', 'BFR',
-]);
-
-const MEDIUM_HIGH_FOOTFALL: Set<string> = new Set([
-  'CBG', 'OXF', 'NRW', 'COV', 'NOT', 'YRK', 'SOT', 'CRE', 'BTN', 'SOU',
-  'PMH', 'IPW', 'HUL', 'WVH', 'EXT', 'PLY', 'DVP', 'GLQ', 'ABD', 'GLC',
-  'MYB', 'WIM', 'CLJ', 'SRA', 'ZFD', 'CHX',
-]);
+// Real ORR station usage data (April 2024 – March 2025, Table 1410)
+const ORR_FOOTFALL: Record<string, FootfallBand> = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'footfall-map.json'), 'utf-8')
+);
 
 function assignFootfallBand(raw: RawStation): FootfallBand {
-  if (HIGH_FOOTFALL.has(raw.crsCode)) return '10m+';
-  if (MEDIUM_HIGH_FOOTFALL.has(raw.crsCode)) return '1m-10m';
-  // Use name length + city-sounding names as rough proxy
-  const name = raw.stationName.toLowerCase();
-  const isMajorCity = /\b(central|piccadilly|lime street|new street|temple meads|queen street|waverley|victoria|paddington|waterloo|euston|cross|junction|international|airport|parkway)\b/.test(name);
-  if (isMajorCity) return '1m-10m';
-  // Small rural stations
-  return '<100k';
+  return ORR_FOOTFALL[raw.crsCode] ?? '<10k';
 }
 
 // ── Platform count assignment ────────────────────────────────────────────────
@@ -118,10 +129,11 @@ const LARGE_STATION_PLATFORMS: Record<string, number> = {
   CRE: 8, BTN: 8, IPW: 4, PMH: 3, TAU: 3, CDF: 8, SWA: 5,
 };
 
-function assignPlatforms(raw: RawStation): number {
-  if (LARGE_STATION_PLATFORMS[raw.crsCode]) {
-    return LARGE_STATION_PLATFORMS[raw.crsCode];
-  }
+function assignPlatforms(raw: RawStation, ukEntry?: UkStation): number {
+  // Prefer NRDP Knowledgebase data when available
+  if (ukEntry?.platforms && ukEntry.platforms > 0) return ukEntry.platforms;
+  // Fall back to hardcoded list for major stations
+  if (LARGE_STATION_PLATFORMS[raw.crsCode]) return LARGE_STATION_PLATFORMS[raw.crsCode];
   const name = raw.stationName.toLowerCase();
   if (/\b(central|junction|parkway|international|airport|interchange)\b/.test(name)) return 4;
   if (/\b(street|road|square|gate|cross)\b/.test(name)) return 3;
@@ -141,7 +153,10 @@ const KNOWN_INTERCHANGE: Set<string> = new Set([
   'BTN', 'SOU', 'NRW', 'OXF', 'WVH', 'CDF', 'EXT',
 ]);
 
-function assignStationType(raw: RawStation, platforms: number): StationType {
+function assignStationType(raw: RawStation, platforms: number, ukEntry?: UkStation): StationType {
+  // NRDP 'terminus' is reliable; use it directly
+  if (ukEntry?.stationType === 'terminus') return 'terminus';
+  // Hardcoded overrides for well-known stations
   if (KNOWN_TERMINUS.has(raw.crsCode)) return 'terminus';
   if (KNOWN_INTERCHANGE.has(raw.crsCode)) return 'interchange';
   if (platforms >= 4) return 'interchange';
@@ -158,11 +173,12 @@ const raw: RawStation[] = JSON.parse(fs.readFileSync(rawPath, 'utf-8'));
 const ukStations: Record<string, UkStation> = JSON.parse(fs.readFileSync(ukStationsPath, 'utf-8'));
 
 const compiled: CompiledStation[] = raw.map((station) => {
+  const ukEntry = ukStations[station.crsCode];
   const region = assignRegion(station);
   const operators = assignOperators(station.crsCode, region, ukStations);
-  const platforms = assignPlatforms(station);
+  const platforms = assignPlatforms(station, ukEntry);
   const footfallBand = assignFootfallBand(station);
-  const stationType = assignStationType(station, platforms);
+  const stationType = assignStationType(station, platforms, ukEntry);
 
   return {
     name: station.stationName,

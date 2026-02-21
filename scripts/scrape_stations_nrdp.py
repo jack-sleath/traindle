@@ -72,6 +72,15 @@ TOC_NAMES = {
     "AW": "Transport for Wales",
     "GX": "Gatwick Express",
     "IL": "Island Line",
+    # Additional / less common codes
+    "GM": "Metrolink",
+    "HS": "Southeastern High Speed",
+    "LD": "Lumo",
+    "LN": "London Northwestern Railway",
+    "LT": "Transport for London",
+    "QC": "West Coast Railways",
+    "TW": "Tyne and Wear Metro",
+    "WM": "West Midlands Metro",
 }
 
 

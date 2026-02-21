@@ -1,7 +1,7 @@
 import { REGION_ADJACENCY } from './regionAdjacency';
 import type { Station, GuessResult, FootfallBand } from './types';
 
-const FOOTFALL_ORDER: FootfallBand[] = ['<100k', '100k-1m', '1m-10m', '10m+'];
+const FOOTFALL_ORDER: FootfallBand[] = ['<10k', '10k-100k', '100k-500k', '500k-1m', '1m-5m', '5m-10m', '10m+'];
 
 export function evaluateGuess(guess: Station, mystery: Station): GuessResult {
   const guessSet = new Set(guess.operators);

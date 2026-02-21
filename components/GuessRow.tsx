@@ -27,7 +27,7 @@ function stationValue(cat: Category, station: Station): string | string[] {
   }
 }
 
-function Tile({ result, label, value, category }: { result: TileResult; label: string; value: string | string[]; category: Category }) {
+function Tile({ result, label, value }: { result: TileResult; label: string; value: string | string[] }) {
   let bg = '';
   let icon = '';
 
@@ -50,17 +50,16 @@ function Tile({ result, label, value, category }: { result: TileResult; label: s
   }
 
   const displayValue = Array.isArray(value) ? value.join(', ') : value;
-  const isOperator = category === 'operator';
 
   return (
     <div
-      className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 ${isOperator ? 'h-[140px] sm:h-[180px]' : 'h-[60px] sm:h-[76px]'} px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
+      className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 h-[140px] sm:h-[180px] px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
       title={`${label}: ${displayValue}`}
     >
       <span className="text-[7px] sm:text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start truncate w-full">
         {label}
       </span>
-      <span className={`text-[9px] sm:text-[11px] font-bold text-center w-full overflow-y-auto flex-1 flex items-center justify-center ${isOperator ? 'leading-relaxed' : 'leading-tight'}`}>
+      <span className="text-[9px] sm:text-[11px] font-bold text-center w-full overflow-y-auto flex-1 flex flex-col items-center justify-center leading-relaxed">
         {Array.isArray(value)
           ? value.map((v) => <span key={v} className="block truncate">{v}</span>)
           : value}
@@ -77,8 +76,8 @@ export default function GuessRow({ entry }: Props) {
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 w-full">
-      <div className="w-14 sm:w-36 shrink-0 truncate text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
-        {station.name}
+      <div className="w-10 shrink-0 text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200" title={station.name}>
+        {station.crs}
       </div>
       <div className="flex gap-1.5 sm:gap-2 flex-1 min-w-0">
         {CATEGORIES.map((cat) => (
@@ -87,7 +86,6 @@ export default function GuessRow({ entry }: Props) {
             result={result[cat]}
             label={CATEGORY_LABELS[cat]}
             value={stationValue(cat, station)}
-            category={cat}
           />
         ))}
       </div>

@@ -5,7 +5,7 @@ import type { Station } from './types';
 const base: Station = {
   name: 'Manchester Piccadilly',
   crs: 'MAN',
-  operator: 'Avanti West Coast',
+  operators: ['Avanti West Coast'],
   region: 'North West',
   platforms: 14,
   footfallBand: '10m+',
@@ -24,7 +24,7 @@ describe('evaluateGuess', () => {
     });
 
     it('returns wrong when operators differ', () => {
-      const mystery = station({ operator: 'Northern' });
+      const mystery = station({ operators: ['Northern'] });
       const result = evaluateGuess(base, mystery);
       expect(result.operator).toBe('wrong');
     });
@@ -93,7 +93,7 @@ describe('evaluateGuess', () => {
     });
 
     it('returns higher when mystery is in a higher band', () => {
-      const guess = station({ footfallBand: '<100k' });
+      const guess = station({ footfallBand: '<10k' });
       const mystery = station({ footfallBand: '10m+' });
       const result = evaluateGuess(guess, mystery);
       expect(result.footfallBand).toBe('higher');
@@ -101,14 +101,14 @@ describe('evaluateGuess', () => {
 
     it('returns lower when mystery is in a lower band', () => {
       const guess = station({ footfallBand: '10m+' });
-      const mystery = station({ footfallBand: '<100k' });
+      const mystery = station({ footfallBand: '<10k' });
       const result = evaluateGuess(guess, mystery);
       expect(result.footfallBand).toBe('lower');
     });
 
     it('returns correct for adjacent band check', () => {
-      const guess = station({ footfallBand: '100k-1m' });
-      const mystery = station({ footfallBand: '100k-1m' });
+      const guess = station({ footfallBand: '100k-500k' });
+      const mystery = station({ footfallBand: '100k-500k' });
       const result = evaluateGuess(guess, mystery);
       expect(result.footfallBand).toBe('correct');
     });
@@ -146,7 +146,7 @@ describe('evaluateGuess', () => {
     });
 
     it('returns mixed result for a partial match', () => {
-      const guess = station({ region: 'North East', platforms: 2, footfallBand: '<100k' });
+      const guess = station({ region: 'North East', platforms: 2, footfallBand: '<10k' });
       const result = evaluateGuess(guess, base);
       expect(result.operator).toBe('correct'); // same operator (from base)
       expect(result.region).toBe('close');     // North East is adjacent to North West
