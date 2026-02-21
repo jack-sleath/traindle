@@ -5,9 +5,10 @@ import StationInput from '@/components/StationInput';
 import GuessRow from '@/components/GuessRow';
 import ThemeToggle from '@/components/ThemeToggle';
 import CountdownTimer from '@/components/CountdownTimer';
+import KeyModal from '@/components/KeyModal';
 import { getDailyStation, stations } from '@/lib/getDailyStation';
 import { evaluateGuess } from '@/lib/evaluateGuess';
-import { setCookieGuesses, getCookieGuesses } from '@/lib/cookieUtils';
+import { setCookieGuesses, getCookieGuesses, clearCookieGuesses } from '@/lib/cookieUtils';
 import type { Station, GuessEntry } from '@/lib/types';
 
 const EMOJI: Record<string, string> = {
@@ -29,12 +30,19 @@ export default function Home() {
   const [guesses, setGuesses] = useState<GuessEntry[]>([]);
   const [mounted, setMounted] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const [showAlsoCorrect, setShowAlsoCorrect] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Load guesses from cookie on mount
+  // Load guesses from cookie on mount; ?reset clears them first
   useEffect(() => {
-    const savedGuesses = getCookieGuesses();
-    setGuesses(savedGuesses);
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('reset')) {
+      clearCookieGuesses();
+      window.history.replaceState({}, '', window.location.pathname);
+    } else {
+      setGuesses(getCookieGuesses());
+    }
     setMounted(true);
   }, []);
 
@@ -84,6 +92,19 @@ export default function Home() {
     [guesses],
   );
 
+  // Stations that share every attribute with the mystery (excluding the mystery itself)
+  const alsoCorrect = useMemo(() => {
+    const mOps = [...mystery.operators].sort().join('|');
+    return stations.filter((s) =>
+      s.crs !== mystery.crs &&
+      [...s.operators].sort().join('|') === mOps &&
+      s.region === mystery.region &&
+      s.platforms === mystery.platforms &&
+      s.footfallBand === mystery.footfallBand &&
+      s.stationType === mystery.stationType,
+    );
+  }, [mystery]);
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center py-10 px-4 transition-colors">
 
@@ -102,6 +123,13 @@ export default function Home() {
           <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
             {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
           </span>
+          <button
+            onClick={() => setShowKey(true)}
+            className="rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="How to play"
+          >
+            ?
+          </button>
           <ThemeToggle />
         </div>
       </div>
@@ -174,10 +202,35 @@ export default function Home() {
               {copied ? 'Copied! ✓' : 'Share result'}
             </button>
 
+            {alsoCorrect.length > 0 && (
+              <div className="mt-4">
+                <button
+                  onClick={() => setShowAlsoCorrect((v) => !v)}
+                  className="w-full flex items-center justify-between rounded-lg bg-gray-100 dark:bg-gray-700 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <span>{alsoCorrect.length} other correct answer{alsoCorrect.length !== 1 ? 's' : ''}</span>
+                  <span>{showAlsoCorrect ? '▲' : '▼'}</span>
+                </button>
+                {showAlsoCorrect && (
+                  <ul className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-800 dark:text-gray-200 divide-y divide-gray-100 dark:divide-gray-700">
+                    {alsoCorrect.map((s) => (
+                      <li key={s.crs} className="flex items-center justify-between px-4 py-2">
+                        <span>{s.name}</span>
+                        <span className="text-xs text-gray-400 ml-2">{s.crs}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
             <CountdownTimer />
           </div>
         </div>
       )}
+
+      {/* Key modal */}
+      {showKey && <KeyModal onClose={() => setShowKey(false)} />}
     </main>
   );
 }

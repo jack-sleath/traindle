@@ -10,7 +10,7 @@ const CATEGORIES = ['operator', 'region', 'platforms', 'footfallBand', 'stationT
 type Category = (typeof CATEGORIES)[number];
 
 const CATEGORY_LABELS: Record<Category, string> = {
-  operator: 'Operator',
+  operator: 'Operators',
   region: 'Region',
   platforms: 'Platforms',
   footfallBand: 'Footfall',

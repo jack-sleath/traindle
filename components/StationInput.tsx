@@ -29,6 +29,13 @@ export default function StationInput({ stations, guessedCrs, onGuess, disabled }
         s.name.toLowerCase().includes(lower) ||
         s.crs.toLowerCase().includes(lower)
       ))
+      .sort((a, b) => {
+        const aC = a.crs.toLowerCase();
+        const bC = b.crs.toLowerCase();
+        const aExact = aC === lower ? 0 : aC.startsWith(lower) ? 1 : a.name.toLowerCase().includes(lower) ? 3 : 2;
+        const bExact = bC === lower ? 0 : bC.startsWith(lower) ? 1 : b.name.toLowerCase().includes(lower) ? 3 : 2;
+        return aExact - bExact;
+      })
       .slice(0, 8);
     setSuggestions(filtered);
     setHighlighted(-1);
