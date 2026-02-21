@@ -68,6 +68,9 @@ export default function StationInput({ stations, guessedCrs, onGuess, disabled }
         disabled={disabled}
         placeholder="Type a station name…"
         autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
         className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
       />
       {suggestions.length > 0 && (

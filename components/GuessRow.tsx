@@ -51,16 +51,16 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
 
   return (
     <div
-      className={`${bg} flex flex-col items-center justify-between rounded-lg w-[88px] h-[76px] px-1.5 py-1.5 text-white select-none`}
+      className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 h-[60px] sm:h-[76px] px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
       title={`${label}: ${value}`}
     >
-      <span className="text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start">
+      <span className="text-[7px] sm:text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start truncate w-full">
         {label}
       </span>
-      <span className="text-[11px] font-bold text-center leading-tight w-full truncate">
+      <span className="text-[9px] sm:text-[11px] font-bold text-center leading-tight w-full truncate">
         {value}
       </span>
-      <span className="text-base font-bold leading-none self-end">
+      <span className="text-sm sm:text-base font-bold leading-none self-end">
         {icon}
       </span>
     </div>
@@ -71,11 +71,11 @@ export default function GuessRow({ entry }: Props) {
   const { station, result } = entry;
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-36 shrink-0 truncate text-sm font-medium text-gray-800 dark:text-gray-200 pr-1">
+    <div className="flex items-center gap-1.5 sm:gap-2 w-full">
+      <div className="w-14 sm:w-36 shrink-0 truncate text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
         {station.name}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-1.5 sm:gap-2 flex-1 min-w-0">
         {CATEGORIES.map((cat) => (
           <Tile
             key={cat}
