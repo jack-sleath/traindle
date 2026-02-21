@@ -24,9 +24,12 @@ export interface Station {
   stationType: StationType;
 }
 
+type RegionDir = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+
 export interface GuessResult {
   operator: 'correct' | 'partial' | 'wrong';
-  region: 'correct' | 'close' | 'wrong';
+  /** close-* = adjacent region (orange), far-* = non-adjacent (red), with compass direction to mystery */
+  region: 'correct' | `close-${RegionDir}` | `far-${RegionDir}`;
   platforms: 'correct' | 'higher' | 'lower';
   footfallBand: 'correct' | 'higher' | 'lower';
   stationType: 'correct' | 'wrong';

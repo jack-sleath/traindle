@@ -27,6 +27,10 @@ function stationValue(cat: Category, station: Station): string | string[] {
   }
 }
 
+const DIRECTION_ARROWS: Record<string, string> = {
+  N: '↑', NE: '↗', E: '→', SE: '↘', S: '↓', SW: '↙', W: '←', NW: '↖',
+};
+
 function Tile({ result, label, value }: { result: TileResult; label: string; value: string | string[] }) {
   let bg = '';
   let icon = '';
@@ -34,9 +38,15 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
   if (result === 'correct') {
     bg = 'bg-green-500 dark:bg-green-600';
     icon = '✓';
-  } else if (result === 'close' || result === 'partial') {
+  } else if (result === 'partial') {
     bg = 'bg-orange-400 dark:bg-orange-500';
     icon = '~';
+  } else if (typeof result === 'string' && result.startsWith('close-')) {
+    bg = 'bg-orange-400 dark:bg-orange-500';
+    icon = DIRECTION_ARROWS[result.slice(6)] ?? '~';
+  } else if (typeof result === 'string' && result.startsWith('far-')) {
+    bg = 'bg-red-500 dark:bg-red-600';
+    icon = DIRECTION_ARROWS[result.slice(4)] ?? '✗';
   } else if (result === 'wrong') {
     bg = 'bg-red-500 dark:bg-red-600';
     icon = '✗';

@@ -36,32 +36,32 @@ describe('evaluateGuess', () => {
       expect(result.region).toBe('correct');
     });
 
-    it('returns close for adjacent regions (North West → North East)', () => {
+    it('returns close-NE for adjacent regions (North West → North East)', () => {
       const guess = station({ region: 'North West' });
       const mystery = station({ region: 'North East' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.region).toBe('close');
+      expect(result.region).toBe('close-NE');
     });
 
-    it('returns close for adjacent regions (North West → Yorkshire)', () => {
+    it('returns close-E for adjacent regions (North West → Yorkshire)', () => {
       const guess = station({ region: 'North West' });
       const mystery = station({ region: 'Yorkshire' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.region).toBe('close');
+      expect(result.region).toBe('close-E');
     });
 
-    it('returns wrong for non-adjacent regions (Scotland → South West)', () => {
+    it('returns far-S for non-adjacent regions (Scotland → South West)', () => {
       const guess = station({ region: 'Scotland' });
       const mystery = station({ region: 'South West' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.region).toBe('wrong');
+      expect(result.region).toBe('far-S');
     });
 
-    it('returns close for Wales → North West (adjacent)', () => {
+    it('returns close-NE for Wales → North West (adjacent)', () => {
       const guess = station({ region: 'Wales' });
       const mystery = station({ region: 'North West' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.region).toBe('close');
+      expect(result.region).toBe('close-NE');
     });
   });
 
@@ -149,7 +149,7 @@ describe('evaluateGuess', () => {
       const guess = station({ region: 'North East', platforms: 2, footfallBand: '<10k' });
       const result = evaluateGuess(guess, base);
       expect(result.operator).toBe('correct'); // same operator (from base)
-      expect(result.region).toBe('close');     // North East is adjacent to North West
+      expect(result.region).toBe('close-SW');   // North East is adjacent to North West; NW is to the south-west
       expect(result.platforms).toBe('higher'); // mystery has 14, guess has 2
       expect(result.footfallBand).toBe('higher'); // mystery is 10m+, guess is <100k
       expect(result.stationType).toBe('correct'); // both interchange

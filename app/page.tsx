@@ -12,12 +12,17 @@ import type { Station, GuessEntry } from '@/lib/types';
 
 const EMOJI: Record<string, string> = {
   correct: '🟩',
-  close: '🟧',
   partial: '🟧',
-  wrong: '🟥',
-  higher: '⬆️',
-  lower: '⬇️',
+  wrong:   '🟥',
+  higher:  '⬆️',
+  lower:   '⬇️',
 };
+function resultEmoji(r: string): string {
+  if (r === 'correct') return '🟩';
+  if (r.startsWith('close-')) return '🟧';
+  if (r.startsWith('far-'))   return '🟥';
+  return EMOJI[r] ?? '⬜';
+}
 
 export default function Home() {
   const mystery: Station = useMemo(() => getDailyStation(), []);
@@ -58,11 +63,11 @@ export default function Home() {
 
   function buildShareText(): string {
     const today = new Date();
-    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const dateStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, '0')}-${String(today.getUTCDate()).padStart(2, '0')}`;
     const score = `${guesses.length}`;
     const categories = ['operator', 'region', 'platforms', 'footfallBand', 'stationType'] as const;
     const grid = guesses
-      .map((g) => categories.map((c) => EMOJI[g.result[c]]).join(''))
+      .map((g) => categories.map((c) => resultEmoji(g.result[c])).join(''))
       .join('\n');
     return `Traindle ${dateStr} — ${score}\n${grid}`;
   }
