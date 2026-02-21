@@ -59,8 +59,13 @@ def fetch_wikitext(title: str) -> str | None:
     return data.get('parse', {}).get('wikitext', {}).get('*')
 
 
-def search_wiki(query: str) -> str | None:
-    """Search Wikipedia and return wikitext of the top result."""
+def wiki_url(title: str) -> str:
+    """Return the Wikipedia article URL for a given page title."""
+    return 'https://en.wikipedia.org/wiki/' + urllib.parse.quote(title.replace(' ', '_'), safe='_-()')
+
+
+def search_wiki(query: str) -> tuple[str, str] | tuple[None, None]:
+    """Search Wikipedia and return (wikitext, title) of the top matching result."""
     data = wiki_get({
         'action': 'query',
         'list': 'search',
@@ -69,15 +74,22 @@ def search_wiki(query: str) -> str | None:
         'srnamespace': 0,
     })
     if not data:
-        return None
+        return None, None
     results = data.get('query', {}).get('search', [])
     for result in results:
         title = result['title']
         time.sleep(RATE_LIMIT_S)
         wikitext = fetch_wikitext(title)
-        if wikitext and looks_like_station_page(wikitext):
-            return wikitext
-    return None
+        if wikitext and is_disambiguation_page(wikitext):
+            best = best_uk_railway_link(wikitext)
+            if not best:
+                continue
+            time.sleep(RATE_LIMIT_S)
+            wikitext = fetch_wikitext(best)
+            title = best
+        if wikitext and looks_like_station_page(wikitext) and looks_like_uk_station_page(wikitext):
+            return wikitext, title
+    return None, None
 
 
 def looks_like_station_page(wikitext: str) -> bool:
@@ -90,6 +102,74 @@ def looks_like_station_page(wikitext: str) -> bool:
         'infobox uk station' in lower or
         'infobox station' in lower
     )
+
+
+_UK_COUNTRY_TERMS = frozenset({
+    'united kingdom', 'england', 'scotland', 'wales', 'northern ireland', 'great britain',
+})
+
+
+def looks_like_uk_station_page(wikitext: str) -> bool:
+    """
+    Returns True if the page is specifically a UK railway station.
+    - 'Infobox UK station' template → definitely UK.
+    - Explicit '| country = ...' field → check against known UK terms.
+    - No country field → assume UK (benefit of the doubt).
+    """
+    if re.search(r'infobox uk station', wikitext, re.IGNORECASE):
+        return True
+    m = re.search(r'\|\s*country\s*=\s*([^\n|{]+)', wikitext, re.IGNORECASE)
+    if m:
+        country = re.sub(r'[\[\]]', '', m.group(1)).strip().lower()
+        return any(term in country for term in _UK_COUNTRY_TERMS)
+    return True  # no country field — assume UK
+
+
+def is_disambiguation_page(wikitext: str) -> bool:
+    """Return True if the wikitext is a Wikipedia disambiguation page."""
+    return bool(re.search(
+        r'\{\{[Dd]isambig|\{\{[Rr]ailway.station.disambig|\{\{[Ss]tation.disambig',
+        wikitext,
+    ))
+
+
+_UK_LINK_TERMS = frozenset({
+    'england', 'scotland', 'wales', 'northern ireland', 'uk', 'united kingdom',
+    'great britain', 'english', 'scottish', 'welsh',
+    'london', 'yorkshire', 'lancashire', 'kent', 'essex', 'surrey', 'sussex',
+    'hampshire', 'berkshire', 'oxfordshire', 'warwickshire', 'derbyshire',
+    'nottinghamshire', 'lincolnshire', 'norfolk', 'suffolk', 'devon', 'cornwall',
+    'somerset', 'gloucestershire', 'worcestershire', 'shropshire', 'cheshire',
+    'merseyside', 'greater manchester', 'west yorkshire', 'south yorkshire',
+    'tyne and wear', 'durham', 'cumbria', 'northumberland', 'west dunbartonshire',
+    'strathclyde', 'highland', 'fife', 'aberdeenshire', 'lothian',
+})
+
+
+def best_uk_railway_link(wikitext: str) -> str | None:
+    """
+    From a disambiguation page, return the title of the wikilink most likely
+    to be a UK railway station, or None if no plausible candidate is found.
+    Scoring: 'railway station' in link = +4, 'train/station' = +1-3,
+             UK location term in link = +2.  Requires score >= 3.
+    """
+    links = re.findall(r'\[\[([^\]|#]+)', wikitext)
+    best, best_score = None, 0
+    for link in links:
+        lower = link.lower()
+        score = 0
+        if 'railway station' in lower:
+            score += 4
+        elif 'train station' in lower:
+            score += 3
+        elif 'station' in lower:
+            score += 1
+        if any(t in lower for t in _UK_LINK_TERMS):
+            score += 2
+        if score > best_score:
+            best_score = score
+            best = link
+    return best if best_score >= 3 else None
 
 
 def extract_platforms(wikitext: str) -> int | None:
@@ -117,11 +197,10 @@ def name_variants(name: str) -> list[str]:
     produce both the full name and the name with the bracketed portion
     stripped (e.g. "Stratford").  Always includes the original name.
     """
-    variants = [name]
     stripped = re.sub(r'\s*\(.*?\)', '', name).strip()
     if stripped and stripped != name:
-        variants.append(stripped)
-    return variants
+        return [stripped, name]
+    return [name]
 
 
 def get_platforms_for_station(name: str) -> tuple[int | None, str]:
@@ -142,12 +221,23 @@ def get_platforms_for_station(name: str) -> tuple[int | None, str]:
         for title, label in candidates:
             wikitext = fetch_wikitext(title)
             time.sleep(RATE_LIMIT_S)
+            if wikitext and is_disambiguation_page(wikitext):
+                best = best_uk_railway_link(wikitext)
+                if best:
+                    wikitext = fetch_wikitext(best)
+                    time.sleep(RATE_LIMIT_S)
+                    label = f'{label} -> "{best}"'
+                    title = best
+                else:
+                    continue  # Disambiguation with no UK railway link — try next
             if wikitext and looks_like_station_page(wikitext):
+                if not looks_like_uk_station_page(wikitext):
+                    continue  # Non-UK station page — try next variant
                 platforms = extract_platforms(wikitext)
                 if platforms is not None:
                     return platforms, label
-                # Page found but no platform field — skip remaining variants
-                return None, f'{label} (no platform field)'
+                # No platform field — log and try remaining candidates
+                print(f'\n    (no platform field: {wiki_url(title)})', end='', flush=True)
 
     # Fall back to Wikipedia search, trying with and without "UK"
     for variant in name_variants(name):
@@ -155,13 +245,13 @@ def get_platforms_for_station(name: str) -> tuple[int | None, str]:
             f'{variant} railway station UK',
             f'{variant} railway station',
         ]:
-            wikitext = search_wiki(query)
+            wikitext, matched_title = search_wiki(query)
             time.sleep(RATE_LIMIT_S)
             if wikitext:
                 platforms = extract_platforms(wikitext)
                 if platforms is not None:
                     return platforms, f'search: "{query}"'
-                return None, f'search: "{query}" (no platform field)'
+                print(f'\n    (no platform field: {wiki_url(matched_title)})', end='', flush=True)
 
     return None, 'not found'
 
