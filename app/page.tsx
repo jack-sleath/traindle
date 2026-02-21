@@ -8,8 +8,6 @@ import { getDailyStation, stations } from '@/lib/getDailyStation';
 import { evaluateGuess } from '@/lib/evaluateGuess';
 import type { Station, GuessEntry } from '@/lib/types';
 
-const MAX_GUESSES = 6;
-
 const EMOJI: Record<string, string> = {
   correct: '🟩',
   close: '🟧',
@@ -28,8 +26,7 @@ export default function Home() {
   const won = guesses.some((g) =>
     Object.values(g.result).every((v) => v === 'correct'),
   );
-  const lost = !won && guesses.length >= MAX_GUESSES;
-  const gameOver = won || lost;
+  const gameOver = won;
 
   function handleGuess(station: Station) {
     if (gameOver) return;
@@ -39,14 +36,13 @@ export default function Home() {
     setGuesses(next);
 
     const justWon = Object.values(result).every((v) => v === 'correct');
-    const justLost = !justWon && next.length >= MAX_GUESSES;
-    if (justWon || justLost) setShowModal(true);
+    if (justWon) setShowModal(true);
   }
 
   function buildShareText(): string {
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const score = won ? `${guesses.length}/${MAX_GUESSES}` : 'X/6';
+    const score = `${guesses.length}`;
     const categories = ['operator', 'region', 'platforms', 'footfallBand', 'stationType'] as const;
     const grid = guesses
       .map((g) => categories.map((c) => EMOJI[g.result[c]]).join(''))
@@ -81,7 +77,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-            {guesses.length} / {MAX_GUESSES}
+            {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
           </span>
           <ThemeToggle />
         </div>
@@ -110,13 +106,7 @@ export default function Home() {
       {/* Game-over inline message */}
       {gameOver && !showModal && (
         <div className="mt-8 text-center">
-          {won ? (
-            <p className="text-green-600 dark:text-green-400 font-semibold text-lg">You got it!</p>
-          ) : (
-            <p className="text-red-600 dark:text-red-400 font-semibold text-lg">
-              The station was <span className="underline">{mystery.name}</span>.
-            </p>
-          )}
+          <p className="text-green-600 dark:text-green-400 font-semibold text-lg">You got it!</p>
           <button
             onClick={() => setShowModal(true)}
             className="mt-3 rounded-full bg-gray-800 dark:bg-gray-200 px-5 py-2 text-sm text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
@@ -143,25 +133,12 @@ export default function Home() {
               ✕
             </button>
 
-            {won ? (
-              <>
-                <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 text-center">
-                  You got it! 🎉
-                </h2>
-                <p className="text-center text-gray-600 dark:text-gray-400 mt-1">
-                  in {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-2xl font-bold text-red-500 dark:text-red-400 text-center">
-                  Better luck tomorrow
-                </h2>
-                <p className="text-center text-gray-700 dark:text-gray-300 mt-2 font-semibold">
-                  The station was: {mystery.name}
-                </p>
-              </>
-            )}
+            <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 text-center">
+              You got it! 🎉
+            </h2>
+            <p className="text-center text-gray-600 dark:text-gray-400 mt-1">
+              in {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
+            </p>
 
             <pre className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-3 text-sm text-center font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200">
               {buildShareText()}
