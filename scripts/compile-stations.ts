@@ -151,7 +151,7 @@ function assignStationType(raw: RawStation, platforms: number): StationType {
 // ── Main compilation ─────────────────────────────────────────────────────────
 
 const rawPath = path.join(__dirname, 'raw-stations.json');
-const ukStationsPath = path.join(__dirname, '..', 'uk_stations.json');
+const ukStationsPath = path.join(__dirname, 'uk_stations.json');
 const outputPath = path.join(__dirname, '..', 'public', 'stations.json');
 
 const raw: RawStation[] = JSON.parse(fs.readFileSync(rawPath, 'utf-8'));

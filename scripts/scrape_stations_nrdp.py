@@ -19,6 +19,7 @@ Output:
   uk_stations.json
 """
 
+import os
 import requests
 import zipfile
 import io
@@ -40,7 +41,7 @@ DTD_TIMETABLE_URLS = [
     f"{BASE_URL}/api/staticfeeds/2.0/timetable",
     f"{BASE_URL}/api/staticfeeds/4.0/timetable",
 ]
-OUTPUT_FILE = "uk_stations.json"
+OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "uk_stations.json")
 
 # TOC code -> operator name (for display)
 TOC_NAMES = {
