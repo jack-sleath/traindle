@@ -17,9 +17,9 @@ const CATEGORY_LABELS: Record<Category, string> = {
   stationType: 'Type',
 };
 
-function stationValue(cat: Category, station: Station): string {
+function stationValue(cat: Category, station: Station): string | string[] {
   switch (cat) {
-    case 'operator':     return station.operators.join(', ');
+    case 'operator':     return station.operators;
     case 'region':       return station.region;
     case 'platforms':    return `${station.platforms} platform${station.platforms !== 1 ? 's' : ''}`;
     case 'footfallBand': return station.footfallBand;
@@ -27,7 +27,7 @@ function stationValue(cat: Category, station: Station): string {
   }
 }
 
-function Tile({ result, label, value }: { result: TileResult; label: string; value: string }) {
+function Tile({ result, label, value }: { result: TileResult; label: string; value: string | string[] }) {
   let bg = '';
   let icon = '';
 
@@ -49,16 +49,20 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
     icon = '↓';
   }
 
+  const displayValue = Array.isArray(value) ? value.join(', ') : value;
+
   return (
     <div
       className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 h-[60px] sm:h-[76px] px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
-      title={`${label}: ${value}`}
+      title={`${label}: ${displayValue}`}
     >
       <span className="text-[7px] sm:text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start truncate w-full">
         {label}
       </span>
-      <span className="text-[9px] sm:text-[11px] font-bold text-center leading-tight w-full truncate">
-        {value}
+      <span className="text-[9px] sm:text-[11px] font-bold text-center leading-tight w-full overflow-hidden">
+        {Array.isArray(value)
+          ? value.map((v) => <span key={v} className="block truncate">{v}</span>)
+          : value}
       </span>
       <span className="text-sm sm:text-base font-bold leading-none self-end">
         {icon}

@@ -25,7 +25,10 @@ export default function StationInput({ stations, guessedCrs, onGuess, disabled }
     }
     const lower = query.toLowerCase();
     const filtered = stations
-      .filter((s) => !guessedCrs.has(s.crs) && s.name.toLowerCase().includes(lower))
+      .filter((s) => !guessedCrs.has(s.crs) && (
+        s.name.toLowerCase().includes(lower) ||
+        s.crs.toLowerCase().includes(lower)
+      ))
       .slice(0, 8);
     setSuggestions(filtered);
     setHighlighted(-1);
