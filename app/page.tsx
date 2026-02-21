@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import StationInput from '@/components/StationInput';
 import GuessRow from '@/components/GuessRow';
 import ThemeToggle from '@/components/ThemeToggle';
+import CountdownTimer from '@/components/CountdownTimer';
 import { getDailyStation, stations } from '@/lib/getDailyStation';
 import { evaluateGuess } from '@/lib/evaluateGuess';
+import { setCookieGuesses, getCookieGuesses } from '@/lib/cookieUtils';
 import type { Station, GuessEntry } from '@/lib/types';
 
 const EMOJI: Record<string, string> = {
@@ -20,8 +22,23 @@ const EMOJI: Record<string, string> = {
 export default function Home() {
   const mystery: Station = useMemo(() => getDailyStation(), []);
   const [guesses, setGuesses] = useState<GuessEntry[]>([]);
+  const [mounted, setMounted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Load guesses from cookie on mount
+  useEffect(() => {
+    const savedGuesses = getCookieGuesses();
+    setGuesses(savedGuesses);
+    setMounted(true);
+  }, []);
+
+  // Save guesses to cookie whenever they change
+  useEffect(() => {
+    if (mounted) {
+      setCookieGuesses(guesses);
+    }
+  }, [guesses, mounted]);
 
   const won = guesses.some((g) =>
     Object.values(g.result).every((v) => v === 'correct'),
@@ -150,6 +167,8 @@ export default function Home() {
             >
               {copied ? 'Copied! ✓' : 'Share result'}
             </button>
+
+            <CountdownTimer />
           </div>
         </div>
       )}

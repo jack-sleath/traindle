@@ -27,7 +27,7 @@ function stationValue(cat: Category, station: Station): string | string[] {
   }
 }
 
-function Tile({ result, label, value }: { result: TileResult; label: string; value: string | string[] }) {
+function Tile({ result, label, value, category }: { result: TileResult; label: string; value: string | string[]; category: Category }) {
   let bg = '';
   let icon = '';
 
@@ -50,16 +50,17 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
   }
 
   const displayValue = Array.isArray(value) ? value.join(', ') : value;
+  const isOperator = category === 'operator';
 
   return (
     <div
-      className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 h-[60px] sm:h-[76px] px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
+      className={`${bg} flex flex-col items-center justify-between rounded-lg flex-1 min-w-0 ${isOperator ? 'h-[140px] sm:h-[180px]' : 'h-[60px] sm:h-[76px]'} px-1 sm:px-1.5 py-1 sm:py-1.5 text-white select-none`}
       title={`${label}: ${displayValue}`}
     >
       <span className="text-[7px] sm:text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start truncate w-full">
         {label}
       </span>
-      <span className="text-[9px] sm:text-[11px] font-bold text-center leading-tight w-full overflow-hidden">
+      <span className={`text-[9px] sm:text-[11px] font-bold text-center w-full overflow-y-auto flex-1 flex items-center justify-center ${isOperator ? 'leading-relaxed' : 'leading-tight'}`}>
         {Array.isArray(value)
           ? value.map((v) => <span key={v} className="block truncate">{v}</span>)
           : value}
@@ -86,6 +87,7 @@ export default function GuessRow({ entry }: Props) {
             result={result[cat]}
             label={CATEGORY_LABELS[cat]}
             value={stationValue(cat, station)}
+            category={cat}
           />
         ))}
       </div>
