@@ -28,16 +28,16 @@ const ROWS = [
     desc: 'No match (operator or station type)',
   },
   {
-    bg: 'bg-amber-400 dark:bg-amber-500',
+    bg: 'bg-orange-400 dark:bg-orange-500',
     icon: '↑',
-    label: 'Higher',
-    desc: 'Mystery value is higher (platforms or footfall)',
+    label: 'Close',
+    desc: 'Platforms: ≤2 off · Footfall: 1 band off — arrow shows direction',
   },
   {
-    bg: 'bg-amber-400 dark:bg-amber-500',
-    icon: '↓',
-    label: 'Lower',
-    desc: 'Mystery value is lower (platforms or footfall)',
+    bg: 'bg-red-500 dark:bg-red-600',
+    icon: '↑',
+    label: 'Far',
+    desc: 'Platforms: >2 off · Footfall: >1 band off — arrow shows direction',
   },
 ];
 

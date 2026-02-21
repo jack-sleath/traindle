@@ -3,7 +3,7 @@
     "crs": "ABW",
     "name": "Abbey Wood",
     "owningOperator": "Elizabeth line",
-    "platforms": null,
+    "platforms": 4,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -21,7 +21,7 @@
     "crs": "ABE",
     "name": "Aber",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -35,7 +35,7 @@
     "crs": "ACY",
     "name": "Abercynon",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -49,7 +49,7 @@
     "crs": "ABA",
     "name": "Aberdare",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -63,7 +63,7 @@
     "crs": "ABD",
     "name": "Aberdeen",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 6,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -83,7 +83,7 @@
     "crs": "AUR",
     "name": "Aberdour",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -97,7 +97,7 @@
     "crs": "AVY",
     "name": "Aberdovey",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -111,7 +111,7 @@
     "crs": "ABH",
     "name": "Abererch",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -125,7 +125,7 @@
     "crs": "AGV",
     "name": "Abergavenny",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -139,7 +139,7 @@
     "crs": "AGL",
     "name": "Abergele & Pensarn",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -155,7 +155,7 @@
     "crs": "AYW",
     "name": "Aberystwyth",
     "owningOperator": "Transport for Wales",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -169,7 +169,7 @@
     "crs": "ACR",
     "name": "Accrington",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -183,7 +183,7 @@
     "crs": "AAT",
     "name": "Achanalt",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -197,7 +197,7 @@
     "crs": "ACN",
     "name": "Achnasheen",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -211,7 +211,7 @@
     "crs": "ACH",
     "name": "Achnashellach",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -225,7 +225,7 @@
     "crs": "ACK",
     "name": "Acklington",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -239,7 +239,7 @@
     "crs": "ACL",
     "name": "Acle",
     "owningOperator": "Greater Anglia",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -253,7 +253,7 @@
     "crs": "ACG",
     "name": "Acocks Green",
     "owningOperator": null,
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -269,7 +269,7 @@
     "crs": "ACB",
     "name": "Acton Bridge (Cheshire)",
     "owningOperator": null,
-    "platforms": null,
+    "platforms": 3,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -291,7 +291,7 @@
     "crs": "ACC",
     "name": "Acton Central",
     "owningOperator": "London Overground",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -307,7 +307,7 @@
     "crs": "AML",
     "name": "Acton Main Line",
     "owningOperator": "Elizabeth line",
-    "platforms": null,
+    "platforms": 3,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -321,7 +321,7 @@
     "crs": "ADD",
     "name": "Adderley Park",
     "owningOperator": null,
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -337,7 +337,7 @@
     "crs": "ADW",
     "name": "Addiewell",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -351,7 +351,7 @@
     "crs": "ASN",
     "name": "Addlestone",
     "owningOperator": "South Western Railway",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -365,7 +365,7 @@
     "crs": "ADM",
     "name": "Adisham",
     "owningOperator": "Southeastern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -379,7 +379,7 @@
     "crs": "ADC",
     "name": "Adlington (Cheshire)",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -393,7 +393,7 @@
     "crs": "ADL",
     "name": "Adlington (Lancashire)",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -407,7 +407,7 @@
     "crs": "AWK",
     "name": "Adwick",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -427,7 +427,7 @@
     "crs": "AIG",
     "name": "Aigburth",
     "owningOperator": "Merseyrail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -441,7 +441,7 @@
     "crs": "ANS",
     "name": "Ainsdale",
     "owningOperator": "Merseyrail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -455,7 +455,7 @@
     "crs": "AIN",
     "name": "Aintree",
     "owningOperator": "Merseyrail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -469,7 +469,7 @@
     "crs": "AIR",
     "name": "Airbles",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -485,7 +485,7 @@
     "crs": "ADR",
     "name": "Airdrie",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 3,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -501,7 +501,7 @@
     "crs": "AYP",
     "name": "Albany Park",
     "owningOperator": "Southeastern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -515,7 +515,7 @@
     "crs": "ALB",
     "name": "Albrighton",
     "owningOperator": null,
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -533,7 +533,7 @@
     "crs": "ALD",
     "name": "Alderley Edge",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -555,7 +555,7 @@
     "crs": "AMT",
     "name": "Aldermaston",
     "owningOperator": "Great Western Railway",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -569,7 +569,7 @@
     "crs": "AHT",
     "name": "Aldershot",
     "owningOperator": "South Western Railway",
-    "platforms": null,
+    "platforms": 3,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -583,7 +583,7 @@
     "crs": "AGT",
     "name": "Aldrington",
     "owningOperator": "Southern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -597,7 +597,7 @@
     "crs": "AAP",
     "name": "Alexandra Palace",
     "owningOperator": "Great Northern",
-    "platforms": null,
+    "platforms": 4,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -623,7 +623,7 @@
     "crs": "AXP",
     "name": "Alexandra Parade",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -651,7 +651,7 @@
     "crs": "ALF",
     "name": "Alfreton",
     "owningOperator": "East Midlands Railway",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -671,7 +671,7 @@
     "crs": "ALW",
     "name": "Allens West",
     "owningOperator": "Northern",
-    "platforms": null,
+    "platforms": 2,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -685,7 +685,7 @@
     "crs": "ALO",
     "name": "Alloa",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [
@@ -699,7 +699,7 @@
     "crs": "ASS",
     "name": "Alness",
     "owningOperator": "ScotRail",
-    "platforms": null,
+    "platforms": 1,
     "stationType": null,
     "region": null,
     "tocCodes": [

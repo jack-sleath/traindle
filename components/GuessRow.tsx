@@ -29,6 +29,7 @@ function stationValue(cat: Category, station: Station): string | string[] {
 
 const DIRECTION_ARROWS: Record<string, string> = {
   N: '↑', NE: '↗', E: '→', SE: '↘', S: '↓', SW: '↙', W: '←', NW: '↖',
+  higher: '↑', lower: '↓',
 };
 
 function Tile({ result, label, value }: { result: TileResult; label: string; value: string | string[] }) {

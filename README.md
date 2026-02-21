@@ -15,11 +15,9 @@ Type a station name or CRS code into the search box and select from the suggesti
 | Tile | Meaning |
 |------|---------|
 | Green ✓ | Exact match |
-| Orange + arrow | Region: neighbouring (adjacent) region — arrow points toward the mystery region |
-| Red + arrow | Region: non-adjacent region — arrow points toward the mystery region |
+| Orange + arrow | Close: adjacent region / footfall ±1 band / platforms ±1–2 — arrow shows direction |
+| Red + arrow | Far: non-adjacent region / footfall >1 band off / platforms >2 off — arrow shows direction |
 | Red ✗ | Wrong — no match (operator or station type) |
-| Amber ↑ | Mystery value is **higher** (platforms or footfall) |
-| Amber ↓ | Mystery value is **lower** (platforms or footfall) |
 
 Press the **?** button in the top-right corner to show this key in-game.
 
@@ -29,8 +27,8 @@ Press the **?** button in the top-right corner to show this key in-game.
 |---|----------|-----------------|
 | 1 | **Operators** | Train operators that call at the station. Green = all match, orange = partial match, red = none match |
 | 2 | **Region** | Which of the 12 UK regions the station is in (see list below). Colour shows adjacent (orange) or far (red); arrow shows compass direction toward the mystery |
-| 3 | **Platforms** | Number of platforms. Green = exact match; amber arrow shows which direction to go |
-| 4 | **Footfall** | Annual passenger footfall band. Green = same band; amber arrow shows direction |
+| 3 | **Platforms** | Number of platforms. Green = exact; orange = ≤2 off; red = >2 off; arrow shows direction |
+| 4 | **Footfall** | Annual passenger footfall band. Green = same band; orange = one band off; red = more than one band off; arrow shows direction |
 | 5 | **Type** | Station type: `terminus`, `through`, or `interchange`. Green or red only |
 
 #### Regions
@@ -98,9 +96,10 @@ The build sets `basePath: /traindle` so all assets resolve correctly under `jack
 All data generation scripts live in `scripts/`. The full pipeline is:
 
 ```
-fetch_raw_stations.py     →  scripts/raw-stations.json   ─┐
-scrape_stations_nrdp.py   →  scripts/uk_stations.json    ─┤→  compile-stations.ts  →  public/stations.json
-generate_footfall_map.py  →  scripts/footfall-map.json   ─┘
+fetch_raw_stations.py      →  scripts/raw-stations.json   ─┐
+scrape_stations_nrdp.py    →  scripts/uk_stations.json    ─┤
+scrape_platforms_wiki.py   →  scripts/uk_stations.json    ─┤→  compile-stations.ts  →  public/stations.json
+generate_footfall_map.py   →  scripts/footfall-map.json   ─┘
 ```
 
 **Prerequisites:** Python 3 and the `requests` library
@@ -142,8 +141,29 @@ Writes `scripts/uk_stations.json` — a map of CRS code → station record inclu
 
 - `operators` — all train operators that call at the station
 - `owningOperator` — the station's managing operator
-- `platforms` — number of platforms (from the Knowledgebase)
+- `platforms` — number of platforms (from the Knowledgebase, or `null` if not provided)
 - `stationType` — `through` / `terminus` / `request` (from the Knowledgebase)
+
+---
+
+### Step 1b — Fill missing platform counts from Wikipedia
+
+The NRDP Knowledgebase often returns `null` for platform counts. This step crawls Wikipedia infoboxes to fill the gaps:
+
+```bash
+python scripts/scrape_platforms_wiki.py
+```
+
+This updates `scripts/uk_stations.json` in place, adding platform counts for any station where the field is still `null`. Progress is saved after each station so it is safe to interrupt and re-run — already-populated entries are skipped.
+
+Options:
+
+```bash
+python scripts/scrape_platforms_wiki.py --dry-run      # preview without writing
+python scripts/scrape_platforms_wiki.py --limit 50     # process only 50 stations (for testing)
+```
+
+Typical run time for all ~2,600 stations: ~15 minutes.
 
 ---
 
@@ -177,7 +197,7 @@ Reads:
 
 Writes `public/stations.json` with all fields the game needs.
 
-**Note:** When NRDP data is available for a station it takes precedence over heuristic estimates for platforms and station type. If data is missing, the compile script falls back to hardcoded values for major stations and name-based heuristics for the rest.
+**Note:** Platform counts are taken from `uk_stations.json` (populated by Steps 1 and 1b). If a station still has no platform data after both steps, the compile script falls back to a hardcoded list of major stations and then a heuristic default of 2. Station type uses NRDP data where available, with hardcoded overrides and a platform-count heuristic as fallback.
 
 ---
 

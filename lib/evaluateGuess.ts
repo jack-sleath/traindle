@@ -52,25 +52,23 @@ export function evaluateGuess(guess: Station, mystery: Station): GuessResult {
     ? 'correct'
     : directionBetween(guess.region, mystery.region);
 
-  let platforms: 'correct' | 'higher' | 'lower';
-  if (guess.platforms === mystery.platforms) {
-    platforms = 'correct';
-  } else if (mystery.platforms > guess.platforms) {
-    platforms = 'higher';
-  } else {
-    platforms = 'lower';
-  }
+  const platDiff = mystery.platforms - guess.platforms;
+  let platforms: GuessResult['platforms'];
+  if (platDiff === 0)                          platforms = 'correct';
+  else if (platDiff >= 1 && platDiff <= 2)     platforms = 'close-higher';
+  else if (platDiff <= -1 && platDiff >= -2)   platforms = 'close-lower';
+  else if (platDiff > 2)                       platforms = 'far-higher';
+  else                                         platforms = 'far-lower';
 
   const guessIdx = FOOTFALL_ORDER.indexOf(guess.footfallBand);
   const mystIdx = FOOTFALL_ORDER.indexOf(mystery.footfallBand);
-  let footfallBand: 'correct' | 'higher' | 'lower';
-  if (guessIdx === mystIdx) {
-    footfallBand = 'correct';
-  } else if (mystIdx > guessIdx) {
-    footfallBand = 'higher';
-  } else {
-    footfallBand = 'lower';
-  }
+  const diff = mystIdx - guessIdx;
+  let footfallBand: GuessResult['footfallBand'];
+  if (diff === 0)       footfallBand = 'correct';
+  else if (diff === 1)  footfallBand = 'close-higher';
+  else if (diff === -1) footfallBand = 'close-lower';
+  else if (diff > 1)    footfallBand = 'far-higher';
+  else                  footfallBand = 'far-lower';
 
   const stationType = guess.stationType === mystery.stationType ? 'correct' : 'wrong';
 

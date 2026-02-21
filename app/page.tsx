@@ -15,8 +15,8 @@ const EMOJI: Record<string, string> = {
   correct: '🟩',
   partial: '🟧',
   wrong:   '🟥',
-  higher:  '⬆️',
-  lower:   '⬇️',
+  higher:  '🟥',
+  lower:   '🟥',
 };
 function resultEmoji(r: string): string {
   if (r === 'correct') return '🟩';
@@ -77,7 +77,7 @@ export default function Home() {
     const grid = guesses
       .map((g) => categories.map((c) => resultEmoji(g.result[c])).join(''))
       .join('\n');
-    return `Traindle ${dateStr} — ${score}\n${grid}`;
+    return `Traindle ${dateStr} — ${score}\n${grid}\nhttps://jack-sleath.github.io/traindle/`;
   }
 
   async function handleShare() {
@@ -85,6 +85,13 @@ export default function Home() {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        // user cancelled — clipboard copy already done
+      }
+    }
   }
 
   const guessedCrs = useMemo(

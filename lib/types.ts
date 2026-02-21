@@ -30,8 +30,10 @@ export interface GuessResult {
   operator: 'correct' | 'partial' | 'wrong';
   /** close-* = adjacent region (orange), far-* = non-adjacent (red), with compass direction to mystery */
   region: 'correct' | `close-${RegionDir}` | `far-${RegionDir}`;
-  platforms: 'correct' | 'higher' | 'lower';
-  footfallBand: 'correct' | 'higher' | 'lower';
+  /** close-higher/lower = ≤2 platforms off (orange), far-higher/lower = >2 platforms off (red) */
+  platforms: 'correct' | 'close-higher' | 'close-lower' | 'far-higher' | 'far-lower';
+  /** close-higher/lower = one band off (orange), far-higher/lower = more than one band off (red) */
+  footfallBand: 'correct' | 'close-higher' | 'close-lower' | 'far-higher' | 'far-lower';
   stationType: 'correct' | 'wrong';
 }
 

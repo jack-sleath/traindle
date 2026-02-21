@@ -71,18 +71,32 @@ describe('evaluateGuess', () => {
       expect(result.platforms).toBe('correct');
     });
 
-    it('returns higher when mystery has more platforms', () => {
+    it('returns far-higher when mystery has many more platforms', () => {
       const guess = station({ platforms: 4 });
       const mystery = station({ platforms: 14 });
       const result = evaluateGuess(guess, mystery);
-      expect(result.platforms).toBe('higher');
+      expect(result.platforms).toBe('far-higher');
     });
 
-    it('returns lower when mystery has fewer platforms', () => {
+    it('returns far-lower when mystery has many fewer platforms', () => {
       const guess = station({ platforms: 14 });
       const mystery = station({ platforms: 4 });
       const result = evaluateGuess(guess, mystery);
-      expect(result.platforms).toBe('lower');
+      expect(result.platforms).toBe('far-lower');
+    });
+
+    it('returns close-higher when mystery has 1-2 more platforms', () => {
+      const guess = station({ platforms: 12 });
+      const mystery = station({ platforms: 14 });
+      const result = evaluateGuess(guess, mystery);
+      expect(result.platforms).toBe('close-higher');
+    });
+
+    it('returns close-lower when mystery has 1-2 fewer platforms', () => {
+      const guess = station({ platforms: 14 });
+      const mystery = station({ platforms: 12 });
+      const result = evaluateGuess(guess, mystery);
+      expect(result.platforms).toBe('close-lower');
     });
   });
 
@@ -92,21 +106,35 @@ describe('evaluateGuess', () => {
       expect(result.footfallBand).toBe('correct');
     });
 
-    it('returns higher when mystery is in a higher band', () => {
+    it('returns far-higher when mystery is many bands higher', () => {
       const guess = station({ footfallBand: '<10k' });
       const mystery = station({ footfallBand: '10m+' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.footfallBand).toBe('higher');
+      expect(result.footfallBand).toBe('far-higher');
     });
 
-    it('returns lower when mystery is in a lower band', () => {
+    it('returns far-lower when mystery is many bands lower', () => {
       const guess = station({ footfallBand: '10m+' });
       const mystery = station({ footfallBand: '<10k' });
       const result = evaluateGuess(guess, mystery);
-      expect(result.footfallBand).toBe('lower');
+      expect(result.footfallBand).toBe('far-lower');
     });
 
-    it('returns correct for adjacent band check', () => {
+    it('returns close-higher when mystery is one band higher', () => {
+      const guess = station({ footfallBand: '100k-500k' });
+      const mystery = station({ footfallBand: '500k-1m' });
+      const result = evaluateGuess(guess, mystery);
+      expect(result.footfallBand).toBe('close-higher');
+    });
+
+    it('returns close-lower when mystery is one band lower', () => {
+      const guess = station({ footfallBand: '500k-1m' });
+      const mystery = station({ footfallBand: '100k-500k' });
+      const result = evaluateGuess(guess, mystery);
+      expect(result.footfallBand).toBe('close-lower');
+    });
+
+    it('returns correct for same band', () => {
       const guess = station({ footfallBand: '100k-500k' });
       const mystery = station({ footfallBand: '100k-500k' });
       const result = evaluateGuess(guess, mystery);
@@ -150,8 +178,8 @@ describe('evaluateGuess', () => {
       const result = evaluateGuess(guess, base);
       expect(result.operator).toBe('correct'); // same operator (from base)
       expect(result.region).toBe('close-SW');   // North East is adjacent to North West; NW is to the south-west
-      expect(result.platforms).toBe('higher'); // mystery has 14, guess has 2
-      expect(result.footfallBand).toBe('higher'); // mystery is 10m+, guess is <100k
+      expect(result.platforms).toBe('far-higher'); // mystery has 14, guess has 2 (12 apart)
+      expect(result.footfallBand).toBe('far-higher'); // mystery is 10m+, guess is <10k (6 bands apart)
       expect(result.stationType).toBe('correct'); // both interchange
     });
   });
