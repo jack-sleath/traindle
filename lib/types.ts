@@ -17,7 +17,7 @@ export type Region =
 export interface Station {
   name: string;
   crs: string;
-  operator: string;
+  operators: string[];
   region: Region;
   platforms: number;
   footfallBand: FootfallBand;
@@ -25,7 +25,7 @@ export interface Station {
 }
 
 export interface GuessResult {
-  operator: 'correct' | 'wrong';
+  operator: 'correct' | 'partial' | 'wrong';
   region: 'correct' | 'close' | 'wrong';
   platforms: 'correct' | 'higher' | 'lower';
   footfallBand: 'correct' | 'higher' | 'lower';

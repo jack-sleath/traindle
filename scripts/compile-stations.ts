@@ -16,10 +16,17 @@ interface RawStation {
   constituentCountry: string;
 }
 
+interface UkStation {
+  crs: string;
+  name: string;
+  operators: string[];
+  owningOperator: string;
+}
+
 interface CompiledStation {
   name: string;
   crs: string;
-  operator: string;
+  operators: string[];
   region: Region;
   platforms: number;
   footfallBand: FootfallBand;
@@ -54,60 +61,6 @@ function assignRegion(raw: RawStation): Region {
 
 // ── Operator assignment ──────────────────────────────────────────────────────
 
-const MAJOR_STATION_OPERATOR: Record<string, string> = {
-  // London terminal operators
-  EUS: 'Avanti West Coast', // Euston
-  KGX: 'LNER',              // Kings Cross
-  PAD: 'Great Western Railway', // Paddington
-  VIC: 'Southeastern',      // Victoria
-  WAT: 'South Western Railway', // Waterloo
-  CST: 'Southeastern',      // Charing Cross
-  LBG: 'Thameslink',        // London Bridge
-  FST: 'Greater Anglia',    // Liverpool Street
-  MYB: 'Chiltern Railways', // Marylebone
-  BFR: 'Thameslink',        // Blackfriars
-  CTK: 'Thameslink',        // City Thameslink
-  // Other major hubs
-  BHM: 'Avanti West Coast', // Birmingham New Street
-  MAN: 'Avanti West Coast', // Manchester Piccadilly
-  LIV: 'Avanti West Coast', // Liverpool Lime Street
-  NCL: 'LNER',              // Newcastle
-  LDS: 'LNER',              // Leeds
-  EDB: 'ScotRail',          // Edinburgh Waverley
-  GLC: 'ScotRail',          // Glasgow Central
-  GLQ: 'ScotRail',          // Glasgow Queen Street
-  BRI: 'Great Western Railway', // Bristol Temple Meads
-  SHF: 'CrossCountry',      // Sheffield
-  NOT: 'East Midlands Railway', // Nottingham
-  CBG: 'Greater Anglia',    // Cambridge
-  OXF: 'Great Western Railway', // Oxford
-  RDG: 'Great Western Railway', // Reading
-  SOT: 'Avanti West Coast', // Stoke-on-Trent
-  CRE: 'Avanti West Coast', // Crewe
-  BTN: 'Southern',          // Brighton
-  EXT: 'Great Western Railway', // Exeter St Davids
-  PLY: 'Great Western Railway', // Plymouth
-  PNZ: 'Great Western Railway', // Penzance
-  YRK: 'LNER',              // York
-  HUL: 'TransPennine Express', // Hull
-  ABD: 'ScotRail',          // Aberdeen
-  IVN: 'ScotRail',          // Inverness
-  DVP: 'CrossCountry',      // Derby
-  COV: 'Avanti West Coast', // Coventry
-  WVH: 'West Midlands Trains', // Wolverhampton
-  NRW: 'Greater Anglia',    // Norwich
-  IPW: 'Greater Anglia',    // Ipswich
-  SOU: 'South Western Railway', // Southampton Central
-  PMH: 'South Western Railway', // Portsmouth Harbour
-  BCE: 'Southern',          // Brighton (also covered above)
-  TAU: 'Great Western Railway', // Taunton
-  SAL: 'Transport for Wales', // Salisbury? No...
-  CHR: 'Transport for Wales', // Chester
-  SWA: 'Transport for Wales', // Swansea
-  CDF: 'Transport for Wales', // Cardiff Central
-  NWP: 'Transport for Wales', // Newport (Wales)
-};
-
 const REGION_OPERATOR: Record<Region, string> = {
   Scotland: 'ScotRail',
   'Northern Ireland': 'Translink',
@@ -123,8 +76,10 @@ const REGION_OPERATOR: Record<Region, string> = {
   'South West': 'South Western Railway',
 };
 
-function assignOperator(raw: RawStation, region: Region): string {
-  return MAJOR_STATION_OPERATOR[raw.crsCode] ?? REGION_OPERATOR[region];
+function assignOperators(crsCode: string, region: Region, ukStations: Record<string, UkStation>): string[] {
+  const ukEntry = ukStations[crsCode];
+  if (ukEntry?.operators?.length) return ukEntry.operators;
+  return [REGION_OPERATOR[region]];
 }
 
 // ── Footfall band assignment ─────────────────────────────────────────────────
@@ -196,13 +151,15 @@ function assignStationType(raw: RawStation, platforms: number): StationType {
 // ── Main compilation ─────────────────────────────────────────────────────────
 
 const rawPath = path.join(__dirname, 'raw-stations.json');
+const ukStationsPath = path.join(__dirname, '..', 'uk_stations.json');
 const outputPath = path.join(__dirname, '..', 'public', 'stations.json');
 
 const raw: RawStation[] = JSON.parse(fs.readFileSync(rawPath, 'utf-8'));
+const ukStations: Record<string, UkStation> = JSON.parse(fs.readFileSync(ukStationsPath, 'utf-8'));
 
 const compiled: CompiledStation[] = raw.map((station) => {
   const region = assignRegion(station);
-  const operator = assignOperator(station, region);
+  const operators = assignOperators(station.crsCode, region, ukStations);
   const platforms = assignPlatforms(station);
   const footfallBand = assignFootfallBand(station);
   const stationType = assignStationType(station, platforms);
@@ -210,7 +167,7 @@ const compiled: CompiledStation[] = raw.map((station) => {
   return {
     name: station.stationName,
     crs: station.crsCode,
-    operator,
+    operators,
     region,
     platforms,
     footfallBand,

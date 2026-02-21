@@ -19,7 +19,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 function stationValue(cat: Category, station: Station): string {
   switch (cat) {
-    case 'operator':     return station.operator;
+    case 'operator':     return station.operators.join(', ');
     case 'region':       return station.region;
     case 'platforms':    return `${station.platforms} platform${station.platforms !== 1 ? 's' : ''}`;
     case 'footfallBand': return station.footfallBand;
@@ -34,7 +34,7 @@ function Tile({ result, label, value }: { result: TileResult; label: string; val
   if (result === 'correct') {
     bg = 'bg-green-500 dark:bg-green-600';
     icon = '✓';
-  } else if (result === 'close') {
+  } else if (result === 'close' || result === 'partial') {
     bg = 'bg-orange-400 dark:bg-orange-500';
     icon = '~';
   } else if (result === 'wrong') {

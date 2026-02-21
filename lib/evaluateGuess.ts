@@ -4,7 +4,13 @@ import type { Station, GuessResult, FootfallBand } from './types';
 const FOOTFALL_ORDER: FootfallBand[] = ['<100k', '100k-1m', '1m-10m', '10m+'];
 
 export function evaluateGuess(guess: Station, mystery: Station): GuessResult {
-  const operator = guess.operator === mystery.operator ? 'correct' : 'wrong';
+  const guessSet = new Set(guess.operators);
+  const mysterySet = new Set(mystery.operators);
+  const matches = mystery.operators.filter((o) => guessSet.has(o)).length;
+  const operator =
+    matches === 0 ? 'wrong'
+    : matches === mysterySet.size && guessSet.size === mysterySet.size ? 'correct'
+    : 'partial';
 
   let region: 'correct' | 'close' | 'wrong';
   if (guess.region === mystery.region) {

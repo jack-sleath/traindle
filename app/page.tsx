@@ -13,9 +13,10 @@ const MAX_GUESSES = 6;
 const EMOJI: Record<string, string> = {
   correct: '🟩',
   close: '🟧',
+  partial: '🟧',
   wrong: '🟥',
-  higher: '🟡',
-  lower: '🟡',
+  higher: '⬆️',
+  lower: '⬇️',
 };
 
 export default function Home() {
