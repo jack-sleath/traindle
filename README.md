@@ -15,6 +15,7 @@ Type a station name or CRS code into the search box and select from the suggesti
 | Tile | Meaning |
 |------|---------|
 | Green ✓ | Exact match |
+| Orange ~ | Partial match — some but not all operators match |
 | Orange + arrow | Close: adjacent region / footfall ±1 band / platforms ±1–2 — arrow shows direction |
 | Red + arrow | Far: non-adjacent region / footfall >1 band off / platforms >2 off — arrow shows direction |
 | Red ✗ | Wrong — no match (operator or station type) |
@@ -77,6 +78,8 @@ npm install
 npm run dev
 ```
 
+Then open [http://localhost:3001](http://localhost:3001) in your browser.
+
 The game runs entirely client-side against `public/stations.json`. No API keys or environment variables are needed.
 
 ---
@@ -102,7 +105,7 @@ scrape_platforms_wiki.py   →  scripts/uk_stations.json    ─┤→  compile-s
 generate_footfall_map.py   →  scripts/footfall-map.json   ─┘
 ```
 
-**Prerequisites:** Python 3 and the `requests` library
+**Prerequisites:** Python 3.10+ and the `requests` library
 
 ```bash
 pip install requests
