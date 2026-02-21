@@ -91,6 +91,7 @@ export default function Home() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             Guess today&apos;s UK railway station
           </p>
+          <CountdownTimer compact />
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
@@ -114,7 +115,7 @@ export default function Home() {
       {/* Guess board */}
       {guesses.length > 0 && (
         <div className="w-full max-w-3xl flex flex-col gap-3">
-          {guesses.map((entry, i) => (
+          {[...guesses].reverse().map((entry, i) => (
             <GuessRow key={i} entry={entry} />
           ))}
         </div>

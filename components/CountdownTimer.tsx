@@ -2,8 +2,12 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState('');
+interface Props {
+  compact?: boolean;
+}
+
+export default function CountdownTimer({ compact = false }: Props) {
+  const [timeLeft, setTimeLeft] = useState('00:00:00');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,14 +31,14 @@ export default function CountdownTimer() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!mounted) {
+  if (compact) {
     return (
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Next puzzle in</p>
-        <p className="font-mono text-2xl font-bold text-gray-700 dark:text-gray-300">
-          00:00:00
-        </p>
-      </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        Next puzzle in{' '}
+        <span className={`font-mono font-semibold ${mounted ? '' : 'opacity-0'}`}>
+          {timeLeft}
+        </span>
+      </p>
     );
   }
 
