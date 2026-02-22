@@ -67,6 +67,7 @@ Scotland · Northern Ireland · Wales · North West · North East · Yorkshire �
 | Parameter | Effect |
 |-----------|--------|
 | `?reset` | Clears saved guesses and easy mode, starting the day fresh |
+| `?reveal` | Shows a banner with today's mystery station name and CRS code |
 
 ---
 

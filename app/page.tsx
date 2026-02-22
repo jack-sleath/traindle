@@ -35,6 +35,7 @@ export default function Home() {
   const [showKey, setShowKey] = useState(false);
   const [showAlsoCorrect, setShowAlsoCorrect] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [revealAnswer, setRevealAnswer] = useState(false);
 
   // Load guesses and easy mode from cookies on mount; ?reset clears them first
   useEffect(() => {
@@ -46,6 +47,7 @@ export default function Home() {
     } else {
       setGuesses(getCookieGuesses());
     }
+    if (params.has('reveal')) setRevealAnswer(true);
     setEasyMode(getEasyModeCookie());
     setMounted(true);
   }, []);
@@ -199,6 +201,14 @@ export default function Home() {
           <ThemeToggle />
         </div>
       </div>
+
+      {/* Dev reveal banner */}
+      {revealAnswer && (
+        <div className="mb-4 w-full max-w-3xl rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-700 dark:bg-yellow-900/20 px-4 py-2 text-sm text-yellow-800 dark:text-yellow-300">
+          <span className="font-semibold">Today&apos;s answer:</span> {mystery.name}{' '}
+          <span className="text-xs text-yellow-600 dark:text-yellow-400">{mystery.crs}</span>
+        </div>
+      )}
 
       {/* Input / game-over message */}
       <div className="mb-8 w-full max-w-3xl">
