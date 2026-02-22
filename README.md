@@ -58,6 +58,7 @@ Scotland · Northern Ireland · Wales · North West · North East · Yorkshire �
 - **Countdown timer** — shows time remaining until the next puzzle, visible in the header and in the results modal
 - **Results & sharing** — on winning, a modal shows your score and an emoji grid you can copy to share
 - **Other correct answers** — if other stations share identical values across all five categories, the results modal shows them in a collapsible list
+- **Easy mode** — press the **Easy** button in the header to enable filter mode; once a category turns green, only stations that also match that attribute appear in search, narrowing the list with each correct answer. Cannot be disabled once on for the day; recorded in your shared result
 - **Dark mode** — toggle between light and dark themes with the button in the top-right corner
 - **Key / legend** — press **?** to open a modal explaining every tile colour and icon
 
@@ -65,7 +66,7 @@ Scotland · Northern Ireland · Wales · North West · North East · Yorkshire �
 
 | Parameter | Effect |
 |-----------|--------|
-| `?reset` | Clears saved guesses and starts the day fresh |
+| `?reset` | Clears saved guesses and easy mode, starting the day fresh |
 
 ---
 

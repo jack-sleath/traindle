@@ -78,6 +78,11 @@ export default function KeyModal({ onClose }: Props) {
           <p className="font-semibold mb-1">Categories (left to right)</p>
           <p>Operators · Region · Platforms · Footfall · Type</p>
         </div>
+
+        <div className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-xs text-amber-800 dark:text-amber-300">
+          <p className="font-semibold mb-1">Easy mode</p>
+          <p>Press <span className="font-semibold">Easy</span> in the header to enable filter mode. Once a category tile turns green, only stations that also match that attribute will appear in the search list, narrowing your options with each correct answer. Easy mode cannot be turned off once enabled and is recorded in your shared result.</p>
+        </div>
       </div>
     </div>
   );

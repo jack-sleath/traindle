@@ -8,7 +8,7 @@ import CountdownTimer from '@/components/CountdownTimer';
 import KeyModal from '@/components/KeyModal';
 import { getDailyStation, stations } from '@/lib/getDailyStation';
 import { evaluateGuess } from '@/lib/evaluateGuess';
-import { setCookieGuesses, getCookieGuesses, clearCookieGuesses } from '@/lib/cookieUtils';
+import { setCookieGuesses, getCookieGuesses, clearCookieGuesses, setEasyModeCookie, getEasyModeCookie, clearEasyModeCookie } from '@/lib/cookieUtils';
 import type { Station, GuessEntry } from '@/lib/types';
 
 const EMOJI: Record<string, string> = {
@@ -29,20 +29,24 @@ export default function Home() {
   const mystery: Station = useMemo(() => getDailyStation(), []);
   const [guesses, setGuesses] = useState<GuessEntry[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [easyMode, setEasyMode] = useState(false);
+  const [easyModeConfirm, setEasyModeConfirm] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const [showAlsoCorrect, setShowAlsoCorrect] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Load guesses from cookie on mount; ?reset clears them first
+  // Load guesses and easy mode from cookies on mount; ?reset clears them first
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.has('reset')) {
       clearCookieGuesses();
+      clearEasyModeCookie();
       window.history.replaceState({}, '', window.location.pathname);
     } else {
       setGuesses(getCookieGuesses());
     }
+    setEasyMode(getEasyModeCookie());
     setMounted(true);
   }, []);
 
@@ -77,7 +81,8 @@ export default function Home() {
     const grid = guesses
       .map((g) => categories.map((c) => resultEmoji(g.result[c])).join(''))
       .join('\n');
-    return `Traindle ${dateStr} — ${score}\n${grid}\nhttps://jack-sleath.github.io/traindle/`;
+    const easyTag = easyMode ? ' [easy mode]' : '';
+    return `Traindle ${dateStr} — ${score}${easyTag}\n${grid}\nhttps://jack-sleath.github.io/traindle/`;
   }
 
   async function handleShare() {
@@ -98,6 +103,45 @@ export default function Home() {
     () => new Set(guesses.map((g) => g.station.crs)),
     [guesses],
   );
+
+  function handleEasyModeClick() {
+    if (!easyModeConfirm) {
+      setEasyModeConfirm(true);
+    } else {
+      setEasyMode(true);
+      setEasyModeConfirm(false);
+      setEasyModeCookie(true);
+    }
+  }
+
+  // When easy mode is on, filter the station list to only show stations that
+  // match every attribute for which a previous guess returned 'correct'.
+  const easyModeStations = useMemo(() => {
+    if (!easyMode) return stations;
+    let filtered = stations;
+    const correctOp = guesses.find((g) => g.result.operator === 'correct');
+    const correctRegion = guesses.find((g) => g.result.region === 'correct');
+    const correctPlatforms = guesses.find((g) => g.result.platforms === 'correct');
+    const correctFootfall = guesses.find((g) => g.result.footfallBand === 'correct');
+    const correctType = guesses.find((g) => g.result.stationType === 'correct');
+    if (correctOp) {
+      const ops = [...correctOp.station.operators].sort().join('|');
+      filtered = filtered.filter((s) => [...s.operators].sort().join('|') === ops);
+    }
+    if (correctRegion) {
+      filtered = filtered.filter((s) => s.region === correctRegion.station.region);
+    }
+    if (correctPlatforms) {
+      filtered = filtered.filter((s) => s.platforms === correctPlatforms.station.platforms);
+    }
+    if (correctFootfall) {
+      filtered = filtered.filter((s) => s.footfallBand === correctFootfall.station.footfallBand);
+    }
+    if (correctType) {
+      filtered = filtered.filter((s) => s.stationType === correctType.station.stationType);
+    }
+    return filtered;
+  }, [easyMode, guesses]);
 
   // Stations that share every attribute with the mystery (excluding the mystery itself)
   const alsoCorrect = useMemo(() => {
@@ -131,6 +175,21 @@ export default function Home() {
             {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
           </span>
           <button
+            onClick={handleEasyModeClick}
+            onBlur={() => setEasyModeConfirm(false)}
+            disabled={easyMode || gameOver}
+            title={easyMode ? 'Easy mode is on — correct answers filter the station list' : 'Enable easy mode: correct answers will filter the station list (cannot be undone today)'}
+            className={`rounded-full px-3 h-8 text-xs font-semibold transition-colors ${
+              easyMode
+                ? 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700 cursor-default'
+                : easyModeConfirm
+                  ? 'bg-amber-100 text-amber-700 border border-amber-300 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700'
+                  : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {easyMode ? 'Easy ✓' : easyModeConfirm ? 'Sure?' : 'Easy'}
+          </button>
+          <button
             onClick={() => setShowKey(true)}
             className="rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="How to play"
@@ -141,16 +200,26 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Input */}
-      {!gameOver && (
-        <div className="mb-8 w-full max-w-3xl">
+      {/* Input / game-over message */}
+      <div className="mb-8 w-full max-w-3xl">
+        {gameOver ? (
+          <div className="text-center">
+            <p className="text-green-600 dark:text-green-400 font-semibold text-lg">You got it!</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="mt-3 rounded-full bg-gray-800 dark:bg-gray-200 px-5 py-2 text-sm text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
+            >
+              Results
+            </button>
+          </div>
+        ) : (
           <StationInput
-            stations={stations}
+            stations={easyModeStations}
             guessedCrs={guessedCrs}
             onGuess={handleGuess}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Guess board */}
       {guesses.length > 0 && (
@@ -158,19 +227,6 @@ export default function Home() {
           {[...guesses].reverse().map((entry, i) => (
             <GuessRow key={i} entry={entry} />
           ))}
-        </div>
-      )}
-
-      {/* Game-over inline message */}
-      {gameOver && !showModal && (
-        <div className="mt-8 text-center">
-          <p className="text-green-600 dark:text-green-400 font-semibold text-lg">You got it!</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="mt-3 rounded-full bg-gray-800 dark:bg-gray-200 px-5 py-2 text-sm text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
-          >
-            Results
-          </button>
         </div>
       )}
 
@@ -197,6 +253,11 @@ export default function Home() {
             <p className="text-center text-gray-600 dark:text-gray-400 mt-1">
               in {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
             </p>
+            {easyMode && (
+              <p className="text-center text-amber-600 dark:text-amber-400 text-xs mt-1 font-medium">
+                Easy mode used
+              </p>
+            )}
 
             <pre className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-3 text-sm text-center font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200">
               {buildShareText()}
