@@ -5,21 +5,17 @@ import type { Station } from './types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const stations: Station[] = require('@/public/stations.json');
 
-function todaySeed(): string {
+function dateSeedDaysAgo(n: number): string {
   const now = new Date();
+  now.setUTCDate(now.getUTCDate() - n);
   const y = now.getUTCFullYear();
   const m = String(now.getUTCMonth() + 1).padStart(2, '0');
   const d = String(now.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
-function yesterdaySeed(): string {
-  const now = new Date();
-  now.setUTCDate(now.getUTCDate() - 1);
-  const y = now.getUTCFullYear();
-  const m = String(now.getUTCMonth() + 1).padStart(2, '0');
-  const d = String(now.getUTCDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+function todaySeed(): string {
+  return dateSeedDaysAgo(0);
 }
 
 function indexForSeed(seed: string): number {
@@ -38,6 +34,19 @@ function categoriesMatch(a: Station, b: Station): boolean {
   );
 }
 
+// Resolve the station that was actually shown on a given date, accounting for its
+// own collision-avoidance against the provided previous station.
+function resolveStationForDate(dateStr: string, prevStation: Station): Station {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const trySeed = attempt === 0 ? dateStr : `${dateStr}-${attempt}`;
+    const idx = indexForSeed(trySeed);
+    if (!categoriesMatch(stations[idx], prevStation)) {
+      return stations[idx];
+    }
+  }
+  return stations[indexForSeed(dateStr)];
+}
+
 export function getDailyStationIndex(seed?: string): number {
   // Custom seed (e.g. ?reveal= testing): skip duplicate check
   if (seed !== undefined) {
@@ -45,12 +54,21 @@ export function getDailyStationIndex(seed?: string): number {
   }
 
   const base = todaySeed();
-  const yesterday = stations[indexForSeed(yesterdaySeed())];
+
+  // Resolve the actual stations shown on the last two days, properly chained so
+  // each accounts for its own collision-avoidance (yesterday may have used a
+  // variant seed, so we can't just use its naive base seed).
+  const threeDaysAgoStation = stations[indexForSeed(dateSeedDaysAgo(3))];
+  const twoDaysAgoStation = resolveStationForDate(dateSeedDaysAgo(2), threeDaysAgoStation);
+  const yesterdayStation = resolveStationForDate(dateSeedDaysAgo(1), twoDaysAgoStation);
 
   for (let attempt = 0; attempt < 10; attempt++) {
     const trySeed = attempt === 0 ? base : `${base}-${attempt}`;
     const idx = indexForSeed(trySeed);
-    if (!categoriesMatch(stations[idx], yesterday)) {
+    if (
+      !categoriesMatch(stations[idx], yesterdayStation) &&
+      !categoriesMatch(stations[idx], twoDaysAgoStation)
+    ) {
       return idx;
     }
   }
