@@ -55,20 +55,17 @@ export function getDailyStationIndex(seed?: string): number {
 
   const base = todaySeed();
 
-  // Resolve the actual stations shown on the last two days, properly chained so
-  // each accounts for its own collision-avoidance (yesterday may have used a
-  // variant seed, so we can't just use its naive base seed).
-  const threeDaysAgoStation = stations[indexForSeed(dateSeedDaysAgo(3))];
-  const twoDaysAgoStation = resolveStationForDate(dateSeedDaysAgo(2), threeDaysAgoStation);
+  // Resolve yesterday's actual station, properly accounting for its own
+  // collision-avoidance (it may have used a variant seed like 2025-06-10-1).
+  // Two days ago is needed as context to resolve yesterday, but today only
+  // needs to avoid yesterday's actual station.
+  const twoDaysAgoStation = stations[indexForSeed(dateSeedDaysAgo(2))];
   const yesterdayStation = resolveStationForDate(dateSeedDaysAgo(1), twoDaysAgoStation);
 
   for (let attempt = 0; attempt < 10; attempt++) {
     const trySeed = attempt === 0 ? base : `${base}-${attempt}`;
     const idx = indexForSeed(trySeed);
-    if (
-      !categoriesMatch(stations[idx], yesterdayStation) &&
-      !categoriesMatch(stations[idx], twoDaysAgoStation)
-    ) {
+    if (!categoriesMatch(stations[idx], yesterdayStation)) {
       return idx;
     }
   }
