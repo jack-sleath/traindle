@@ -13,13 +13,13 @@ const ROWS = [
     bg: 'bg-orange-400 dark:bg-orange-500',
     icon: '↗',
     label: 'Adjacent region',
-    desc: 'Neighbouring region — arrow points toward the mystery region',
+    desc: 'Neighbouring region — arrow points toward the station\'s region',
   },
   {
     bg: 'bg-red-500 dark:bg-red-600',
     icon: '↗',
     label: 'Wrong region',
-    desc: 'Non-adjacent region — arrow points toward the mystery region',
+    desc: 'Non-adjacent region — arrow points toward the station\'s region',
   },
   {
     bg: 'bg-red-500 dark:bg-red-600',

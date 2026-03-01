@@ -64,20 +64,20 @@ function explainResult(cat: Category, result: TileResult): string {
       if (cat === 'region') {
         const dirLabel = DIRECTION_LABELS[dir] ?? dir;
         return isClose
-          ? `Adjacent region — mystery is to the ${dirLabel}`
-          : `Non-adjacent region — mystery is to the ${dirLabel}`;
+          ? `Adjacent region — the station is to the ${dirLabel}`
+          : `Non-adjacent region — the station is to the ${dirLabel}`;
       }
       if (cat === 'platforms') {
         const more = dir === 'higher';
         return isClose
-          ? `Mystery has 1–2 ${more ? 'more' : 'fewer'} platforms`
-          : `Mystery has 3+ ${more ? 'more' : 'fewer'} platforms`;
+          ? `The station has 1–2 ${more ? 'more' : 'fewer'} platforms`
+          : `The station has 3+ ${more ? 'more' : 'fewer'} platforms`;
       }
       if (cat === 'footfallBand') {
         const higher = dir === 'higher';
         return isClose
-          ? `Mystery is one footfall band ${higher ? 'higher' : 'lower'}`
-          : `Mystery is 2+ footfall bands ${higher ? 'higher' : 'lower'}`;
+          ? `The station is one footfall band ${higher ? 'higher' : 'lower'}`
+          : `The station is 2+ footfall bands ${higher ? 'higher' : 'lower'}`;
       }
     }
   }
