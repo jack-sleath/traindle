@@ -264,8 +264,8 @@ export default function Home() {
               in {guesses.length} guess{guesses.length !== 1 ? 'es' : ''}
             </p>
             <p className="text-center font-semibold text-gray-900 dark:text-gray-100 mt-3 text-lg">
-              {mystery.name}
-              <span className="ml-2 text-sm font-normal text-gray-400 dark:text-gray-500">{mystery.crs}</span>
+              {guesses[guesses.length - 1]?.station.name ?? mystery.name}
+              <span className="ml-2 text-sm font-normal text-gray-400 dark:text-gray-500">{guesses[guesses.length - 1]?.station.crs ?? mystery.crs}</span>
             </p>
             {easyMode && (
               <p className="text-center text-amber-600 dark:text-amber-400 text-xs mt-1 font-medium">
