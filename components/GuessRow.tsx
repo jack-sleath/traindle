@@ -129,10 +129,8 @@ function Tile({ cat, result, label, value, isOpen, onToggle }: {
         <span className="text-[7px] sm:text-[9px] uppercase tracking-widest font-semibold opacity-80 leading-none self-start truncate w-full">
           {label}
         </span>
-        <span className="text-[9px] sm:text-[11px] font-bold text-center w-full overflow-hidden break-words flex-1 flex flex-col items-center justify-center leading-relaxed">
-          {Array.isArray(value)
-            ? value.map((v) => <span key={v} className="block w-full">{v}</span>)
-            : value}
+        <span className="text-[9px] sm:text-[11px] font-bold text-center w-full overflow-hidden break-words flex-1 flex items-center justify-center leading-relaxed">
+          {displayValue}
         </span>
         <span className="text-sm sm:text-base font-bold leading-none self-end">
           {icon}
