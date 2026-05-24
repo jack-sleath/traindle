@@ -12,9 +12,34 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://jack-sleath.github.io/traindle";
+const ogImageUrl = `${siteUrl}/og-image.png`;
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Traindle",
   description: "Guess the UK railway station — a daily Wordle-style game",
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    siteName: "Traindle",
+    title: "Traindle",
+    description: "Guess the UK railway station — a daily Wordle-style game",
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "Traindle — guess the UK railway station",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Traindle",
+    description: "Guess the UK railway station — a daily Wordle-style game",
+    images: [ogImageUrl],
+  },
 };
 
 export default function RootLayout({
